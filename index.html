@@ -3,1043 +3,1340 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Domo + Snowflake — Better Together</title>
+  <title>Data Integration for Snowflake — Domo + Snowflake</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&family=Lato:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
-    /* ─── DOMO DESIGN SYSTEM ─────────────────────────────────── */
+
+    /* ═══════════════════════════════════════════════════════════
+       DESIGN TOKENS — DOMO + SNOWFLAKE CO-BRAND
+    ═══════════════════════════════════════════════════════════ */
     :root {
+      /* Domo palette */
       --domo-blue: #99CCEE;
       --domo-blue-dark: #7BB8E0;
-      --neutral-50: #F1F6FA;
-      --neutral-100: #DCE4EA;
-      --neutral-200: #B7C1CB;
-      --neutral-600: #68737F;
-      --neutral-900: #3F454D;
-      --accent-orange: #FF9922;
-      --accent-orange-dark: #E8891F;
-      --accent-purple: #776CB0;
-      --accent-mint: #ADD4C1;
-      --font-primary: 'Open Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+      --domo-orange: #FF9922;
+      --domo-orange-dark: #E8891F;
+      --domo-charcoal: #3F454D;
+      --domo-neutral-50: #F1F6FA;
+      --domo-neutral-100: #DCE4EA;
+      --domo-neutral-200: #B7C1CB;
+      --domo-neutral-600: #68737F;
+
+      /* Snowflake palette */
+      --sf-blue: #29B5E8;
+      --sf-mid-blue: #11567F;
+      --sf-iceberg: #003545;
+      --sf-star-blue: #71D3DC;
+      --sf-orange: #FF9F36;
+
+      /* Shared neutrals */
+      --text-primary: #3F454D;
+      --text-secondary: #68737F;
+      --border: #DCE4EA;
+      --bg-light: #F1F6FA;
+
+      /* Typography */
+      --font-domo: 'Open Sans', -apple-system, sans-serif;
+      --font-sf: 'Lato', -apple-system, sans-serif;
+
+      /* Shadows */
       --shadow-sm: 0 1px 3px rgba(63,69,77,0.08), 0 1px 2px rgba(63,69,77,0.06);
       --shadow-md: 0 4px 12px rgba(63,69,77,0.1), 0 2px 4px rgba(63,69,77,0.06);
-      --shadow-lg: 0 8px 20px rgba(63,69,77,0.08), 0 4px 8px rgba(63,69,77,0.04);
-      --shadow-blue-glow: 0 4px 20px rgba(153,204,238,0.35);
-      --shadow-orange-glow: 0 4px 20px rgba(255,153,34,0.35);
-      --radius-sm: 6px;
-      --radius-md: 8px;
-      --radius-lg: 12px;
-      --ease-smooth: cubic-bezier(0.83, 0, 0.17, 1);
-      --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+      --shadow-lg: 0 8px 24px rgba(63,69,77,0.1), 0 4px 8px rgba(63,69,77,0.05);
+      --shadow-blue: 0 4px 20px rgba(153,204,238,0.3);
+      --shadow-orange: 0 4px 20px rgba(255,153,34,0.3);
+      --shadow-sf: 0 4px 20px rgba(41,181,232,0.25);
+
+      /* Radii */
+      --r-sm: 6px;
+      --r-md: 8px;
+      --r-lg: 12px;
+      --r-pill: 80px;
+
+      /* Motion */
+      --ease: cubic-bezier(0.83, 0, 0.17, 1);
+      --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
     }
 
     *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
-
     html { scroll-behavior: smooth; }
-
     body {
-      font-family: var(--font-primary);
-      color: var(--neutral-900);
+      font-family: var(--font-domo);
+      color: var(--text-primary);
       background: #fff;
       -webkit-font-smoothing: antialiased;
       overflow-x: hidden;
     }
 
-    /* ─── TYPOGRAPHY ─────────────────────────────────────────── */
-    h1 { font-size: clamp(2.2rem, 5vw, 3.6rem); font-weight: 800; line-height: 1.1; letter-spacing: -0.02em; }
-    h2 { font-size: clamp(1.6rem, 3.5vw, 2.4rem); font-weight: 700; line-height: 1.2; letter-spacing: -0.01em; }
-    h3 { font-size: clamp(1.1rem, 2vw, 1.4rem); font-weight: 700; line-height: 1.3; }
-    p  { font-size: clamp(0.9rem, 1.5vw, 1rem); font-weight: 400; line-height: 1.7; color: var(--neutral-600); }
-
     /* ─── ANIMATIONS ─────────────────────────────────────────── */
-    @keyframes domoFadeInUp {
-      from { opacity: 0; transform: translateY(1.5rem); }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(1.25rem); }
       to   { opacity: 1; transform: translateY(0); }
     }
-    @keyframes domoFadeIn {
-      from { opacity: 0; }
-      to   { opacity: 1; }
-    }
-    @keyframes floatSnow {
-      0%, 100% { transform: translateY(0px) rotate(0deg); }
-      50%       { transform: translateY(-12px) rotate(3deg); }
-    }
-    @keyframes shimmerPulse {
-      0%, 100% { opacity: 0.6; }
-      50%       { opacity: 1; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); opacity: 1; }
+      50%       { transform: scale(1.1); opacity: 0.7; }
     }
 
-    .domo-animate {
-      opacity: 0;
-      transform: translateY(1.5rem);
-      transition: opacity 0.6s var(--ease-out-expo), transform 0.6s var(--ease-out-expo);
-    }
-    .domo-animate.visible {
-      opacity: 1;
-      transform: translateY(0);
-    }
-    .delay-1 { transition-delay: 0.05s; }
-    .delay-2 { transition-delay: 0.1s; }
-    .delay-3 { transition-delay: 0.15s; }
-    .delay-4 { transition-delay: 0.2s; }
-    .delay-5 { transition-delay: 0.25s; }
-    .delay-6 { transition-delay: 0.3s; }
+    .anim { opacity: 0; transform: translateY(1.25rem); transition: opacity 0.55s var(--ease-out), transform 0.55s var(--ease-out); }
+    .anim.in { opacity: 1; transform: none; }
+    .d1 { transition-delay: 0.07s; }
+    .d2 { transition-delay: 0.14s; }
+    .d3 { transition-delay: 0.21s; }
+    .d4 { transition-delay: 0.28s; }
+    .d5 { transition-delay: 0.35s; }
+    .d6 { transition-delay: 0.42s; }
 
-    /* ─── FOCUS ──────────────────────────────────────────────── */
-    *:focus-visible {
-      outline: 2px solid var(--domo-blue);
-      outline-offset: 2px;
-    }
+    *:focus-visible { outline: 2px solid var(--sf-blue); outline-offset: 2px; }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
     }
 
-    /* ─── NAV ─────────────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════
+       NAV
+    ═══════════════════════════════════════════════════════════ */
     nav {
-      position: fixed;
-      top: 0; left: 0; right: 0;
-      z-index: 100;
-      background: rgba(255,255,255,0.95);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border-bottom: 1px solid var(--neutral-100);
-      padding: 0 2rem;
-      height: 64px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 200;
+      height: 68px;
+      background: rgba(255,255,255,0.97);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border);
       box-shadow: var(--shadow-sm);
+      display: flex; align-items: center;
+      padding: 0 2.5rem;
+      gap: 1.5rem;
     }
-    .nav-logo { display: flex; align-items: center; gap: 0.75rem; text-decoration: none; }
-    .nav-logo-text {
+    .nav-logos {
+      display: flex; align-items: center; gap: 1.25rem; flex: 1;
+    }
+    .nav-divider { width: 1px; height: 24px; background: var(--border); }
+    .nav-partner-label {
+      font-family: var(--font-sf);
+      font-size: 0.7rem;
       font-weight: 700;
-      font-size: 0.9rem;
-      color: var(--neutral-600);
-      letter-spacing: 0.02em;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
     }
-    .nav-logo-divider {
-      width: 1px;
-      height: 20px;
-      background: var(--neutral-200);
-    }
-    .nav-snowflake-badge {
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--neutral-600);
-    }
-    .snowflake-dot {
-      width: 8px; height: 8px;
-      background: #29B5E8;
-      border-radius: 50%;
-    }
-    .nav-cta {
-      padding: 0.5rem 1.25rem;
-      background: var(--accent-orange);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: var(--font-primary);
-      font-weight: 600;
+    .nav-cta-group { display: flex; align-items: center; gap: 0.75rem; }
+    .btn-nav-ghost {
+      font-family: var(--font-domo);
       font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text-primary);
+      text-decoration: none;
+      padding: 0.45rem 1rem;
+      border-radius: var(--r-md);
+      transition: all 0.25s var(--ease);
+    }
+    .btn-nav-ghost:hover { background: var(--bg-light); }
+    /* Snowflake-style pill CTA */
+    .btn-sf-pill {
+      font-family: var(--font-sf);
+      font-size: 0.8rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      background: var(--sf-blue);
+      border: none;
+      border-radius: var(--r-pill);
+      padding: 0.55rem 1.5rem;
       cursor: pointer;
       text-decoration: none;
-      transition: all 0.3s var(--ease-smooth);
+      transition: all 0.3s var(--ease);
+      display: inline-block;
     }
-    .nav-cta:hover {
-      background: var(--accent-orange-dark);
+    .btn-sf-pill:hover {
+      background: var(--sf-mid-blue);
       transform: translateY(-1px);
-      box-shadow: var(--shadow-orange-glow);
+      box-shadow: var(--shadow-sf);
     }
 
-    /* ─── HERO ───────────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════
+       HERO
+    ═══════════════════════════════════════════════════════════ */
     .hero {
-      background: linear-gradient(160deg, var(--domo-blue) 0%, var(--domo-blue-dark) 60%, #6AAED8 100%);
-      padding: 8rem 2rem 6rem;
-      text-align: center;
+      padding: 8.5rem 2rem 6rem;
+      background: linear-gradient(150deg, var(--sf-iceberg) 0%, var(--sf-mid-blue) 45%, #1A7AAD 75%, var(--domo-blue-dark) 100%);
       position: relative;
       overflow: hidden;
+      text-align: center;
     }
     .hero::before {
       content: '';
-      position: absolute;
-      inset: 0;
-      background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.04'%3E%3Ccircle cx='30' cy='30' r='2'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+      position: absolute; inset: 0;
+      background: radial-gradient(ellipse 70% 60% at 50% 100%, rgba(153,204,238,0.15) 0%, transparent 70%);
       pointer-events: none;
     }
-    .hero-partnership {
-      display: inline-flex;
-      align-items: center;
-      gap: 0.75rem;
-      background: rgba(255,255,255,0.2);
-      border: 1px solid rgba(255,255,255,0.3);
-      border-radius: 100px;
-      padding: 0.4rem 1rem;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: #fff;
-      margin-bottom: 1.5rem;
-      animation: domoFadeIn 0.6s var(--ease-out-expo) forwards;
-    }
-    .partnership-dot {
-      width: 6px; height: 6px;
-      background: var(--accent-orange);
-      border-radius: 50%;
-      animation: shimmerPulse 2s ease-in-out infinite;
-    }
-    .hero h1 {
-      color: #fff;
-      max-width: 820px;
-      margin: 0 auto 1.25rem;
-      animation: domoFadeInUp 0.7s var(--ease-out-expo) 0.1s both;
-    }
-    .hero-sub {
-      font-size: clamp(1rem, 2vw, 1.2rem);
-      font-weight: 300;
-      color: rgba(255,255,255,0.9);
-      max-width: 640px;
-      margin: 0 auto 2.5rem;
-      animation: domoFadeInUp 0.7s var(--ease-out-expo) 0.2s both;
-    }
-    .hero-actions {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-      animation: domoFadeInUp 0.7s var(--ease-out-expo) 0.3s both;
-    }
-    .btn-primary {
-      padding: 0.875rem 2rem;
-      background: var(--accent-orange);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: var(--font-primary);
-      font-weight: 700;
-      font-size: 0.9375rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-smooth);
-      display: inline-block;
-    }
-    .btn-primary:hover {
-      background: var(--accent-orange-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-orange-glow);
-    }
-    .btn-secondary {
-      padding: 0.875rem 2rem;
-      background: rgba(255,255,255,0.15);
-      color: #fff;
-      border: 1.5px solid rgba(255,255,255,0.5);
-      border-radius: var(--radius-md);
-      font-family: var(--font-primary);
-      font-weight: 600;
-      font-size: 0.9375rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-smooth);
-      display: inline-block;
-    }
-    .btn-secondary:hover {
-      background: rgba(255,255,255,0.25);
-      border-color: #fff;
-      transform: translateY(-2px);
-    }
-    .hero-logos {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1.5rem;
-      margin-top: 3.5rem;
-      animation: domoFadeInUp 0.7s var(--ease-out-expo) 0.4s both;
-    }
-    .hero-logo-pill {
-      background: rgba(255,255,255,0.15);
-      border: 1px solid rgba(255,255,255,0.25);
-      border-radius: 100px;
-      padding: 0.5rem 1.25rem;
-      color: #fff;
-      font-weight: 600;
-      font-size: 0.9rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
-    .plus-sign {
-      font-size: 1.5rem;
-      font-weight: 300;
-      color: rgba(255,255,255,0.6);
-    }
-
-    /* ─── PROBLEM SECTION ────────────────────────────────────── */
-    .problem-section {
-      background: var(--neutral-900);
-      padding: 5rem 2rem;
-      text-align: center;
-    }
-    .problem-section h2 { color: #fff; margin-bottom: 1rem; }
-    .problem-section p { color: rgba(255,255,255,0.7); max-width: 680px; margin: 0 auto 3rem; font-size: 1.05rem; }
-    .problem-cards {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-      gap: 1rem;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    .problem-card {
-      background: rgba(255,255,255,0.04);
-      border: 1px solid rgba(255,255,255,0.08);
-      border-radius: var(--radius-lg);
-      padding: 1.75rem;
-      text-align: left;
-      transition: all 0.3s var(--ease-smooth);
-    }
-    .problem-card:hover {
-      background: rgba(255,255,255,0.07);
-      border-color: rgba(153,204,238,0.3);
-      transform: translateY(-3px);
-    }
-    .problem-icon {
-      width: 40px; height: 40px;
-      background: rgba(153,204,238,0.15);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      margin-bottom: 1rem;
-    }
-    .problem-card h3 { color: #fff; font-size: 1rem; margin-bottom: 0.5rem; }
-    .problem-card p { color: rgba(255,255,255,0.55); font-size: 0.875rem; }
-
-    /* ─── HOW IT WORKS ───────────────────────────────────────── */
-    .how-section {
-      background: #fff;
-      padding: 5rem 2rem;
-      text-align: center;
-    }
-    .section-label {
-      display: inline-block;
-      font-size: 0.75rem;
-      font-weight: 700;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      color: var(--domo-blue);
-      background: rgba(153,204,238,0.15);
-      padding: 0.3rem 0.8rem;
-      border-radius: var(--radius-sm);
-      margin-bottom: 1rem;
-    }
-    .how-section h2 { color: var(--neutral-900); margin-bottom: 1rem; }
-    .how-section > p { max-width: 600px; margin: 0 auto 3.5rem; }
-    .how-stack {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 1rem;
-      flex-wrap: wrap;
-      max-width: 960px;
-      margin: 0 auto;
-    }
-    .how-block {
-      flex: 1;
-      min-width: 240px;
-      max-width: 280px;
-      background: var(--neutral-50);
-      border: 1px solid var(--neutral-100);
-      border-radius: var(--radius-lg);
-      padding: 2rem 1.5rem;
-      text-align: center;
-      transition: all 0.3s var(--ease-smooth);
-    }
-    .how-block:hover {
-      box-shadow: var(--shadow-md);
-      border-color: rgba(153,204,238,0.4);
-      transform: translateY(-3px);
-    }
-    .how-block-icon {
-      width: 56px; height: 56px;
-      border-radius: 50%;
-      display: flex; align-items: center; justify-content: center;
-      margin: 0 auto 1rem;
-      font-size: 1.5rem;
-    }
-    .how-block h3 { font-size: 1.05rem; margin-bottom: 0.5rem; }
-    .how-block p { font-size: 0.875rem; }
-    .how-connector {
-      font-size: 2rem;
-      font-weight: 300;
-      color: var(--neutral-200);
-      flex-shrink: 0;
-    }
-    .how-result {
-      width: 100%;
-      background: linear-gradient(135deg, rgba(153,204,238,0.12) 0%, rgba(255,153,34,0.08) 100%);
-      border: 1.5px solid rgba(153,204,238,0.3);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      margin-top: 1.5rem;
-      text-align: center;
-    }
-    .how-result h3 { color: var(--neutral-900); margin-bottom: 0.5rem; }
-    .how-result p { max-width: 560px; margin: 0 auto; }
-
-    /* ─── STATS STRIP ────────────────────────────────────────── */
-    .stats-strip {
-      background: var(--domo-blue);
-      padding: 3rem 2rem;
-    }
-    .stats-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-      gap: 2rem;
-      text-align: center;
-    }
-    .stat-item {}
-    .stat-number {
-      font-size: clamp(2rem, 5vw, 3rem);
-      font-weight: 300;
-      color: #fff;
-      line-height: 1;
-      margin-bottom: 0.3rem;
-    }
-    .stat-label {
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: rgba(255,255,255,0.75);
-      letter-spacing: 0.04em;
-      text-transform: uppercase;
-    }
-
-    /* ─── BENEFITS ───────────────────────────────────────────── */
-    .benefits-section {
-      background: var(--neutral-50);
-      padding: 5rem 2rem;
-    }
-    .benefits-inner {
-      max-width: 1060px;
-      margin: 0 auto;
-      text-align: center;
-    }
-    .benefits-inner h2 { margin-bottom: 0.75rem; }
-    .benefits-inner > p { max-width: 600px; margin: 0 auto 3rem; }
-    .benefits-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 1.25rem;
-      text-align: left;
-    }
-    .benefit-card {
-      background: #fff;
-      border: 1px solid var(--neutral-100);
-      border-radius: var(--radius-lg);
-      padding: 2rem;
-      box-shadow: var(--shadow-sm);
-      transition: all 0.3s var(--ease-smooth);
-      position: relative;
-      overflow: hidden;
-    }
-    .benefit-card::before {
+    /* subtle grid texture */
+    .hero::after {
       content: '';
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
-      background: var(--domo-blue);
-      border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+      position: absolute; inset: 0;
+      background-image: linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 48px 48px;
+      pointer-events: none;
     }
-    .benefit-card:hover {
-      transform: translateY(-4px);
-      box-shadow: var(--shadow-lg);
-      border-color: rgba(153,204,238,0.3);
-    }
-    .benefit-number {
-      font-size: 2.5rem;
-      font-weight: 800;
-      color: rgba(153,204,238,0.25);
-      line-height: 1;
-      margin-bottom: 0.75rem;
-    }
-    .benefit-card h3 { font-size: 1.1rem; margin-bottom: 0.5rem; color: var(--neutral-900); }
-    .benefit-card p { font-size: 0.9rem; margin-bottom: 1rem; }
-    .benefit-impact {
-      display: flex;
-      align-items: flex-start;
-      gap: 0.5rem;
-      background: var(--neutral-50);
-      border-radius: var(--radius-sm);
-      padding: 0.75rem;
-    }
-    .impact-dot {
-      width: 6px; height: 6px;
-      background: var(--accent-orange);
-      border-radius: 50%;
-      margin-top: 0.35rem;
-      flex-shrink: 0;
-    }
-    .benefit-impact p { font-size: 0.82rem; font-weight: 600; color: var(--neutral-600); margin: 0; }
+    .hero-inner { position: relative; z-index: 1; max-width: 880px; margin: 0 auto; }
 
-    /* ─── TECHNICAL ──────────────────────────────────────────── */
-    .tech-section {
-      background: #fff;
-      padding: 5rem 2rem;
+    .hero-badge {
+      display: inline-flex; align-items: center; gap: 0.6rem;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: var(--r-pill);
+      padding: 0.35rem 1rem 0.35rem 0.5rem;
+      margin-bottom: 2rem;
+      animation: fadeIn 0.6s var(--ease-out) both;
     }
-    .tech-inner {
-      max-width: 1060px;
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 4rem;
-      align-items: center;
-    }
-    .tech-content h2 { margin-bottom: 1rem; }
-    .tech-content > p { margin-bottom: 2rem; }
-    .tech-features {
-      display: flex;
-      flex-direction: column;
-      gap: 1rem;
-    }
-    .tech-feature {
-      display: flex;
-      align-items: flex-start;
-      gap: 1rem;
-      padding: 1rem;
-      background: var(--neutral-50);
-      border-radius: var(--radius-md);
-      border: 1px solid var(--neutral-100);
-      transition: all 0.3s var(--ease-smooth);
-    }
-    .tech-feature:hover {
-      border-color: rgba(153,204,238,0.4);
-      box-shadow: var(--shadow-sm);
-    }
-    .tech-feature-icon {
-      width: 36px; height: 36px;
-      background: rgba(153,204,238,0.15);
-      border-radius: var(--radius-sm);
-      display: flex; align-items: center; justify-content: center;
-      flex-shrink: 0;
-    }
-    .tech-feature-text h4 { font-size: 0.9rem; font-weight: 700; color: var(--neutral-900); margin-bottom: 0.2rem; }
-    .tech-feature-text p { font-size: 0.82rem; margin: 0; }
-    .tech-visual {
-      background: var(--neutral-900);
-      border-radius: var(--radius-lg);
-      padding: 2.5rem;
-      position: relative;
-    }
-    .arch-diagram {
-      display: flex;
-      flex-direction: column;
-      gap: 0.75rem;
-    }
-    .arch-layer {
-      background: rgba(255,255,255,0.06);
-      border: 1px solid rgba(255,255,255,0.1);
-      border-radius: var(--radius-md);
-      padding: 1.25rem 1.5rem;
-      display: flex;
-      align-items: center;
-      gap: 1rem;
-    }
-    .arch-layer-icon {
-      font-size: 1.4rem;
-      flex-shrink: 0;
-    }
-    .arch-layer-label { font-size: 0.75rem; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.15rem; }
-    .arch-layer-desc  { font-size: 0.8rem; font-weight: 400; }
-    .arch-arrow {
-      text-align: center;
-      color: rgba(255,255,255,0.2);
-      font-size: 1.2rem;
-    }
-    .layer-domo   { color: var(--domo-blue); }
-    .layer-sf     { color: #29B5E8; }
-    .layer-result { color: var(--accent-orange); }
-
-    /* ─── QUOTE ──────────────────────────────────────────────── */
-    .quote-section {
-      background: linear-gradient(160deg, var(--domo-blue) 0%, var(--domo-blue-dark) 100%);
-      padding: 5rem 2rem;
-      text-align: center;
-    }
-    .quote-mark {
-      font-size: 5rem;
-      font-weight: 800;
-      color: rgba(255,255,255,0.2);
-      line-height: 0.6;
-      margin-bottom: 1.5rem;
-    }
-    .quote-text {
-      font-size: clamp(1.1rem, 2.5vw, 1.5rem);
-      font-weight: 300;
-      color: #fff;
-      max-width: 760px;
-      margin: 0 auto 1.5rem;
-      line-height: 1.6;
-    }
-    .quote-attribution {
-      font-size: 0.875rem;
-      font-weight: 600;
+    .hero-badge-logos { display: flex; align-items: center; gap: 0.5rem; }
+    .hero-badge-dot { width: 1px; height: 16px; background: rgba(255,255,255,0.3); }
+    .hero-badge-text {
+      font-family: var(--font-sf);
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
       color: rgba(255,255,255,0.8);
     }
-    .quote-attribution span {
-      display: block;
-      font-weight: 400;
-      color: rgba(255,255,255,0.6);
+
+    .hero h1 {
+      font-family: var(--font-domo);
+      font-size: clamp(2.2rem, 5vw, 3.75rem);
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.08;
+      letter-spacing: -0.025em;
+      margin-bottom: 1.25rem;
+      animation: fadeInUp 0.65s var(--ease-out) 0.1s both;
+    }
+    .hero h1 em {
+      font-style: normal;
+      color: var(--domo-blue);
+    }
+    .hero-sub {
+      font-family: var(--font-domo);
+      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.85);
+      max-width: 660px;
+      margin: 0 auto 2.75rem;
+      line-height: 1.7;
+      animation: fadeInUp 0.65s var(--ease-out) 0.2s both;
+    }
+    .hero-actions {
+      display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap;
+      animation: fadeInUp 0.65s var(--ease-out) 0.3s both;
+    }
+    /* Domo-style orange CTA */
+    .btn-orange {
+      font-family: var(--font-domo);
+      font-size: 0.9375rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--domo-orange);
+      border: none;
+      border-radius: var(--r-md);
+      padding: 0.875rem 2rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s var(--ease);
+      display: inline-block;
+    }
+    .btn-orange:hover {
+      background: var(--domo-orange-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-orange);
+    }
+    /* Snowflake-style pill ghost */
+    .btn-ghost-pill {
+      font-family: var(--font-sf);
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #fff;
+      background: rgba(255,255,255,0.1);
+      border: 1.5px solid rgba(255,255,255,0.45);
+      border-radius: var(--r-pill);
+      padding: 0.875rem 2rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s var(--ease);
+      display: inline-block;
+    }
+    .btn-ghost-pill:hover {
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.7);
+      transform: translateY(-2px);
+    }
+
+    .hero-logos-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 2rem; margin-top: 4rem;
+      animation: fadeInUp 0.65s var(--ease-out) 0.4s both;
+    }
+    .hero-logo-chip {
+      display: flex; align-items: center; gap: 0.6rem;
+      background: rgba(255,255,255,0.08);
+      border: 1px solid rgba(255,255,255,0.15);
+      border-radius: var(--r-pill);
+      padding: 0.5rem 1.25rem;
+    }
+    .hero-logo-chip span {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+    }
+    .hero-plus {
+      font-size: 1.5rem;
+      font-weight: 300;
+      color: rgba(255,255,255,0.35);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       OVERVIEW STRIP
+    ═══════════════════════════════════════════════════════════ */
+    .overview-strip {
+      background: var(--bg-light);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 2.5rem;
+    }
+    .overview-strip-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: flex; align-items: center; gap: 2rem; flex-wrap: wrap;
+    }
+    .overview-headline {
+      font-size: clamp(1rem, 2vw, 1.15rem);
+      font-weight: 700;
+      color: var(--text-primary);
+      flex: 1; min-width: 260px;
+    }
+    .overview-headline em {
+      font-style: normal;
+      color: var(--sf-mid-blue);
+    }
+    .overview-divider { width: 1px; height: 36px; background: var(--border); flex-shrink: 0; }
+    .overview-stat {
+      display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 100px;
+    }
+    .overview-stat-num {
+      font-size: 1.5rem;
+      font-weight: 800;
+      color: var(--sf-mid-blue);
+      line-height: 1;
+    }
+    .overview-stat-label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--text-secondary);
       margin-top: 0.2rem;
     }
 
-    /* ─── CTA SECTION ────────────────────────────────────────── */
-    .cta-section {
-      background: var(--neutral-50);
-      padding: 6rem 2rem;
-      text-align: center;
-    }
-    .cta-inner { max-width: 680px; margin: 0 auto; }
-    .cta-inner h2 { margin-bottom: 1rem; }
-    .cta-inner p { margin-bottom: 2.5rem; font-size: 1.05rem; }
-    .cta-buttons {
-      display: flex;
-      gap: 1rem;
-      justify-content: center;
-      flex-wrap: wrap;
-    }
-    .btn-cta-primary {
-      padding: 1rem 2.25rem;
-      background: var(--accent-orange);
-      color: #fff;
-      border: none;
-      border-radius: var(--radius-md);
-      font-family: var(--font-primary);
+    /* ═══════════════════════════════════════════════════════════
+       SHARED SECTION SCAFFOLDING
+    ═══════════════════════════════════════════════════════════ */
+    .section { padding: 5.5rem 2rem; }
+    .section-inner { max-width: 1080px; margin: 0 auto; }
+    .section-label {
+      display: inline-flex; align-items: center; gap: 0.4rem;
+      font-size: 0.7rem;
       font-weight: 700;
-      font-size: 1rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-smooth);
-      display: inline-block;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      margin-bottom: 1rem;
+      border-radius: var(--r-sm);
+      padding: 0.3rem 0.75rem;
     }
-    .btn-cta-primary:hover {
-      background: var(--accent-orange-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-orange-glow);
+    .label-domo { color: var(--domo-blue-dark); background: rgba(153,204,238,0.15); }
+    .label-sf   { color: var(--sf-mid-blue);    background: rgba(41,181,232,0.1); }
+    .label-dot { width: 5px; height: 5px; border-radius: 50%; animation: pulse 2s ease-in-out infinite; }
+    .label-dot-domo { background: var(--domo-blue); }
+    .label-dot-sf   { background: var(--sf-blue); }
+
+    .section-header { margin-bottom: 3.5rem; }
+    .section-header h2 {
+      font-size: clamp(1.6rem, 3.5vw, 2.4rem);
+      font-weight: 700;
+      line-height: 1.2;
+      letter-spacing: -0.015em;
+      margin-bottom: 0.75rem;
     }
-    .btn-cta-secondary {
-      padding: 1rem 2.25rem;
-      background: #fff;
-      color: var(--neutral-900);
-      border: 1.5px solid var(--neutral-200);
-      border-radius: var(--radius-md);
-      font-family: var(--font-primary);
-      font-weight: 600;
-      font-size: 1rem;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s var(--ease-smooth);
-      display: inline-block;
-    }
-    .btn-cta-secondary:hover {
-      border-color: var(--domo-blue);
-      color: var(--domo-blue-dark);
-      transform: translateY(-2px);
-      box-shadow: var(--shadow-md);
+    .section-header p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      max-width: 620px;
+      line-height: 1.7;
     }
 
-    /* ─── FOOTER ─────────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════
+       INTEGRATION OVERVIEW (How It Connects)
+    ═══════════════════════════════════════════════════════════ */
+    .overview-section { background: #fff; }
+    .overview-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 1.25rem;
+    }
+    .overview-card {
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 2rem;
+      transition: all 0.3s var(--ease);
+    }
+    .overview-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: rgba(41,181,232,0.3);
+      transform: translateY(-3px);
+    }
+    .ov-icon {
+      width: 48px; height: 48px;
+      border-radius: var(--r-md);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1.25rem;
+    }
+    .ov-icon-sf   { background: rgba(41,181,232,0.12); }
+    .ov-icon-domo { background: rgba(153,204,238,0.2); }
+    .ov-icon-joint{ background: rgba(255,153,34,0.12); }
+    .overview-card h3 { font-size: 1.05rem; font-weight: 700; margin-bottom: 0.5rem; }
+    .overview-card p  { font-size: 0.9rem; color: var(--text-secondary); line-height: 1.65; }
+
+    /* ═══════════════════════════════════════════════════════════
+       FEATURES GRID
+    ═══════════════════════════════════════════════════════════ */
+    .features-section { background: var(--bg-light); }
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1rem;
+    }
+    .feature-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.75rem;
+      display: flex; gap: 1rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s var(--ease);
+    }
+    .feature-card:hover {
+      box-shadow: var(--shadow-md);
+      border-color: rgba(153,204,238,0.35);
+      transform: translateY(-2px);
+    }
+    .feature-card.sf-featured {
+      border-color: rgba(41,181,232,0.3);
+      background: linear-gradient(135deg, rgba(41,181,232,0.04) 0%, #fff 50%);
+    }
+    .feature-card.sf-featured:hover {
+      border-color: var(--sf-blue);
+      box-shadow: var(--shadow-sf);
+    }
+    .feat-icon {
+      width: 38px; height: 38px; flex-shrink: 0;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .feat-icon-domo { background: rgba(153,204,238,0.18); }
+    .feat-icon-sf   { background: rgba(41,181,232,0.12); }
+    .feat-body h4 {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      margin-bottom: 0.35rem;
+      line-height: 1.3;
+    }
+    .feat-body p {
+      font-size: 0.83rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+    }
+    .sf-tag {
+      display: inline-block;
+      font-family: var(--font-sf);
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sf-mid-blue);
+      background: rgba(41,181,232,0.1);
+      border-radius: var(--r-pill);
+      padding: 0.15rem 0.5rem;
+      margin-bottom: 0.3rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       TRANSFORMATION / MAGIC ETL
+    ═══════════════════════════════════════════════════════════ */
+    .transform-section { background: #fff; }
+    .transform-inner {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 5rem;
+      align-items: start;
+    }
+    .transform-content h2 { margin-bottom: 0.75rem; }
+    .transform-content > p { margin-bottom: 2rem; font-size: 1rem; color: var(--text-secondary); line-height: 1.7; }
+    .transform-list { display: flex; flex-direction: column; gap: 0.875rem; }
+    .tl-item {
+      display: flex; gap: 0.875rem;
+      padding: 1rem 1.25rem;
+      background: var(--bg-light);
+      border: 1px solid var(--border);
+      border-radius: var(--r-md);
+      transition: all 0.3s var(--ease);
+    }
+    .tl-item:hover {
+      border-color: rgba(153,204,238,0.4);
+      box-shadow: var(--shadow-sm);
+    }
+    .tl-icon {
+      width: 32px; height: 32px; flex-shrink: 0;
+      border-radius: var(--r-sm);
+      background: rgba(153,204,238,0.2);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tl-text h4 { font-size: 0.875rem; font-weight: 700; margin-bottom: 0.2rem; }
+    .tl-text p  { font-size: 0.8rem; color: var(--text-secondary); line-height: 1.5; }
+
+    .transform-visual {
+      background: var(--sf-iceberg);
+      border-radius: var(--r-lg);
+      padding: 2.5rem;
+      position: sticky; top: 88px;
+    }
+    .tv-header {
+      display: flex; align-items: center; gap: 0.75rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .tv-header-text h3 {
+      font-size: 0.9rem; font-weight: 700; color: #fff; margin-bottom: 0.1rem;
+    }
+    .tv-header-text p {
+      font-size: 0.72rem; color: rgba(255,255,255,0.5);
+    }
+    .pipeline-row {
+      display: flex; flex-direction: column; gap: 0.5rem; margin-bottom: 1.5rem;
+    }
+    .pipeline-node {
+      display: flex; align-items: center; gap: 0.75rem;
+      padding: 0.875rem 1rem;
+      border-radius: var(--r-md);
+      transition: all 0.3s var(--ease);
+    }
+    .pipeline-node:hover { filter: brightness(1.1); }
+    .pn-sources { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.08); }
+    .pn-domo    { background: rgba(153,204,238,0.12); border: 1px solid rgba(153,204,238,0.2); }
+    .pn-sf      { background: rgba(41,181,232,0.12);  border: 1px solid rgba(41,181,232,0.2); }
+    .pn-output  { background: rgba(255,153,34,0.1);   border: 1px solid rgba(255,153,34,0.2); }
+    .pn-dot {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem; flex-shrink: 0;
+    }
+    .pn-label { font-size: 0.75rem; font-weight: 700; line-height: 1.2; }
+    .pn-sub   { font-size: 0.65rem; font-weight: 400; opacity: 0.6; }
+    .pn-arrow { text-align: center; color: rgba(255,255,255,0.15); font-size: 1rem; padding: 0.1rem 0; }
+    .tv-note {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: var(--r-md);
+      padding: 0.875rem 1rem;
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.55);
+      line-height: 1.5;
+    }
+    .tv-note strong { color: var(--domo-blue); font-weight: 600; }
+
+    /* ═══════════════════════════════════════════════════════════
+       STATS BAND
+    ═══════════════════════════════════════════════════════════ */
+    .stats-band {
+      background: linear-gradient(90deg, var(--sf-mid-blue) 0%, #1A7AAD 50%, var(--domo-blue-dark) 100%);
+      padding: 3.5rem 2rem;
+    }
+    .stats-band-inner {
+      max-width: 1080px; margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 2.5rem;
+      text-align: center;
+    }
+    .stat-n {
+      font-family: var(--font-domo);
+      font-size: clamp(2.2rem, 4.5vw, 3rem);
+      font-weight: 300;
+      color: #fff;
+      line-height: 1;
+    }
+    .stat-l {
+      font-family: var(--font-sf);
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.65);
+      margin-top: 0.4rem;
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       GOVERNANCE / SECURITY
+    ═══════════════════════════════════════════════════════════ */
+    .security-section { background: var(--bg-light); }
+    .security-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+    }
+    .security-card {
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: var(--r-lg);
+      padding: 1.75rem;
+      box-shadow: var(--shadow-sm);
+      transition: all 0.3s var(--ease);
+    }
+    .security-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+    .sec-icon {
+      width: 42px; height: 42px;
+      border-radius: var(--r-sm);
+      display: flex; align-items: center; justify-content: center;
+      margin-bottom: 1rem;
+    }
+    .security-card h4 { font-size: 0.9rem; font-weight: 700; margin-bottom: 0.4rem; }
+    .security-card p  { font-size: 0.83rem; color: var(--text-secondary); line-height: 1.6; }
+    .cert-badges {
+      display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 1rem;
+    }
+    .cert-badge {
+      font-family: var(--font-sf);
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      padding: 0.25rem 0.6rem;
+      border-radius: var(--r-pill);
+      border: 1px solid;
+    }
+    .cert-domo { color: var(--domo-blue-dark); border-color: var(--domo-blue); background: rgba(153,204,238,0.1); }
+    .cert-sf   { color: var(--sf-mid-blue);    border-color: var(--sf-blue);   background: rgba(41,181,232,0.08); }
+
+    /* ═══════════════════════════════════════════════════════════
+       QUOTE
+    ═══════════════════════════════════════════════════════════ */
+    .quote-section {
+      background: var(--sf-iceberg);
+      padding: 5.5rem 2rem;
+    }
+    .quotes-inner { max-width: 1080px; margin: 0 auto; }
+    .quotes-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(420px, 1fr));
+      gap: 1.5rem;
+    }
+    .quote-card {
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: var(--r-lg);
+      padding: 2.25rem;
+      transition: all 0.3s var(--ease);
+    }
+    .quote-card:hover { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); }
+    .quote-mark { font-size: 3rem; font-weight: 800; line-height: 0.7; margin-bottom: 1rem; }
+    .quote-text {
+      font-size: clamp(0.95rem, 1.8vw, 1.1rem);
+      font-weight: 300;
+      color: rgba(255,255,255,0.9);
+      line-height: 1.7;
+      margin-bottom: 1.5rem;
+    }
+    .quote-attrib { font-size: 0.82rem; font-weight: 700; }
+    .quote-attrib span { display: block; font-weight: 400; opacity: 0.55; margin-top: 0.2rem; }
+
+    /* ═══════════════════════════════════════════════════════════
+       CTA
+    ═══════════════════════════════════════════════════════════ */
+    .cta-section { background: #fff; padding: 6rem 2rem; text-align: center; }
+    .cta-inner { max-width: 680px; margin: 0 auto; }
+    .cta-inner h2 { font-size: clamp(1.7rem, 3.5vw, 2.5rem); font-weight: 700; margin-bottom: 1rem; letter-spacing: -0.015em; }
+    .cta-inner p { font-size: 1.05rem; color: var(--text-secondary); margin-bottom: 2.5rem; line-height: 1.7; }
+    .cta-btns { display: flex; gap: 1rem; justify-content: center; flex-wrap: wrap; }
+    .btn-cta-orange {
+      font-family: var(--font-domo);
+      font-size: 1rem;
+      font-weight: 700;
+      color: #fff;
+      background: var(--domo-orange);
+      border: none;
+      border-radius: var(--r-md);
+      padding: 1rem 2.25rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s var(--ease);
+      display: inline-block;
+    }
+    .btn-cta-orange:hover {
+      background: var(--domo-orange-dark);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-orange);
+    }
+    .btn-cta-sf {
+      font-family: var(--font-sf);
+      font-size: 0.82rem;
+      font-weight: 900;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: var(--sf-mid-blue);
+      background: #fff;
+      border: 1.5px solid var(--sf-blue);
+      border-radius: var(--r-pill);
+      padding: 1rem 2.25rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: all 0.3s var(--ease);
+      display: inline-block;
+    }
+    .btn-cta-sf:hover {
+      background: var(--sf-blue);
+      color: #fff;
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-sf);
+    }
+
+    /* ═══════════════════════════════════════════════════════════
+       FOOTER
+    ═══════════════════════════════════════════════════════════ */
     footer {
-      background: var(--neutral-900);
-      padding: 3rem 2rem;
+      background: var(--sf-iceberg);
+      padding: 3rem 2.5rem;
       display: flex;
       align-items: center;
       justify-content: space-between;
       flex-wrap: wrap;
       gap: 1.5rem;
+      border-top: 1px solid rgba(255,255,255,0.07);
     }
-    .footer-left { display: flex; align-items: center; gap: 1.5rem; }
-    .footer-tagline { font-size: 0.8rem; color: rgba(255,255,255,0.4); }
-    .footer-links { display: flex; gap: 1.5rem; }
+    .footer-logos { display: flex; align-items: center; gap: 1.5rem; flex-wrap: wrap; }
+    .footer-copy { font-size: 0.75rem; color: rgba(255,255,255,0.35); margin-top: 0.2rem; }
+    .footer-links { display: flex; gap: 1.75rem; flex-wrap: wrap; }
     .footer-links a {
-      font-size: 0.8rem;
-      color: rgba(255,255,255,0.5);
+      font-size: 0.78rem;
+      color: rgba(255,255,255,0.45);
       text-decoration: none;
-      transition: color 0.3s;
+      transition: color 0.25s;
     }
     .footer-links a:hover { color: var(--domo-blue); }
 
-    /* ─── RESPONSIVE ─────────────────────────────────────────── */
+    /* ═══════════════════════════════════════════════════════════
+       RESPONSIVE
+    ═══════════════════════════════════════════════════════════ */
     @media (max-width: 992px) {
-      .tech-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .transform-inner { grid-template-columns: 1fr; gap: 2.5rem; }
+      .transform-visual { position: static; }
     }
     @media (max-width: 768px) {
-      nav { padding: 0 1rem; }
-      .hero { padding: 7rem 1.25rem 4rem; }
-      .problem-section, .how-section, .benefits-section, .tech-section, .quote-section, .cta-section { padding: 3.5rem 1.25rem; }
-      .stats-strip { padding: 2.5rem 1.25rem; }
+      nav { padding: 0 1.25rem; gap: 1rem; }
+      .nav-partner-label { display: none; }
+      .hero { padding: 7.5rem 1.25rem 4.5rem; }
+      .section { padding: 4rem 1.25rem; }
+      .stats-band { padding: 2.5rem 1.25rem; }
+      .quote-section { padding: 4rem 1.25rem; }
+      .cta-section { padding: 4.5rem 1.25rem; }
       footer { flex-direction: column; align-items: flex-start; padding: 2.5rem 1.25rem; }
-      .how-connector { display: none; }
+      .quotes-grid { grid-template-columns: 1fr; }
+      .overview-strip { padding: 1.5rem 1.25rem; }
     }
+
   </style>
 </head>
 <body>
 
-  <!-- NAV -->
-  <nav>
-    <a href="#" class="nav-logo">
-      <!-- Domo Logo (white version for light nav — using blue variant) -->
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="36" height="36" aria-label="Domo logo">
-        <path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
-        <path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
-        <path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-        <path fill="#99CCEE" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/>
-        <path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-        <path fill="#3F454D" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
-      </svg>
-      <div class="nav-logo-divider"></div>
-      <div class="nav-snowflake-badge">
-        <div class="snowflake-dot"></div>
-        Snowflake Partner
-      </div>
-    </a>
-    <a href="https://www.domo.com/partners/snowflake" class="nav-cta" target="_blank" rel="noopener">Learn More</a>
-  </nav>
+<!-- ═══ NAV ═══════════════════════════════════════════════════ -->
+<nav>
+  <div class="nav-logos">
+    <!-- Domo Logo -->
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="36" height="36" aria-label="Domo">
+      <path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
+      <path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
+      <path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+      <path fill="#99CCEE" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/>
+      <path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+      <path fill="#3F454D" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
+    </svg>
+    <div class="nav-divider"></div>
+    <!-- Snowflake icon -->
+    <svg width="28" height="28" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Snowflake">
+      <rect x="44" y="5" width="12" height="90" rx="6" fill="#29B5E8"/>
+      <rect x="5" y="44" width="90" height="12" rx="6" fill="#29B5E8"/>
+      <rect x="18.4" y="14.6" width="12" height="70.7" rx="6" transform="rotate(-45 18.4 14.6)" fill="#29B5E8"/>
+      <rect x="14.6" y="68.7" width="12" height="70.7" rx="6" transform="rotate(-135 14.6 68.7)" fill="#29B5E8"/>
+      <circle cx="50" cy="50" r="10" fill="#003545"/>
+      <circle cx="50" cy="5" r="6" fill="#29B5E8"/>
+      <circle cx="50" cy="95" r="6" fill="#29B5E8"/>
+      <circle cx="5" cy="50" r="6" fill="#29B5E8"/>
+      <circle cx="95" cy="50" r="6" fill="#29B5E8"/>
+    </svg>
+    <div class="nav-divider"></div>
+    <span class="nav-partner-label">Data Integration Partnership</span>
+  </div>
+  <div class="nav-cta-group">
+    <a href="https://www.domo.com/platform/integration" class="btn-nav-ghost" target="_blank" rel="noopener">Explore Connectors</a>
+    <a href="https://www.domo.com/partners/snowflake" class="btn-sf-pill" target="_blank" rel="noopener">See Partnership</a>
+  </div>
+</nav>
 
-  <!-- HERO -->
-  <section class="hero">
-    <div class="hero-partnership">
-      <div class="partnership-dot"></div>
-      Strategic Technology Partnership
-    </div>
-    <h1>Your Snowflake Data.<br>Finally in Every Hand.</h1>
-    <p class="hero-sub">
-      Domo bridges the last mile between your Snowflake investment and the business decisions that drive results — no data movement required.
-    </p>
-    <div class="hero-actions">
-      <a href="https://www.domo.com/partners/snowflake" class="btn-primary" target="_blank" rel="noopener">See It in Action</a>
-      <a href="https://www.domo.com/" class="btn-secondary" target="_blank" rel="noopener">Talk to Sales</a>
-    </div>
-    <div class="hero-logos">
-      <div class="hero-logo-pill">
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="22" height="22" aria-hidden="true">
+<!-- ═══ HERO ══════════════════════════════════════════════════ -->
+<section class="hero">
+  <div class="hero-inner">
+    <div class="hero-badge anim">
+      <div class="hero-badge-logos">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="18" height="18" aria-hidden="true">
           <path fill="#fff" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
           <path fill="#fff" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
           <path fill="#fff" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-          <path fill="#fff" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/>
           <path fill="#fff" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-          <path fill="rgba(255,255,255,0.5)" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
+          <path fill="rgba(255,255,255,0.45)" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
         </svg>
-        Domo
-      </div>
-      <div class="plus-sign">+</div>
-      <div class="hero-logo-pill">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-          <path d="M12 2L14.09 8.26L21 9L15.45 13.97L17.18 21L12 17.77L6.82 21L8.55 13.97L3 9L9.91 8.26L12 2Z" fill="white" opacity="0.9"/>
+        <div class="hero-badge-dot" style="background: rgba(255,255,255,0.4);"></div>
+        <svg width="16" height="16" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect x="44" y="2" width="12" height="96" rx="6" fill="rgba(255,255,255,0.9)"/>
+          <rect x="2" y="44" width="96" height="12" rx="6" fill="rgba(255,255,255,0.9)"/>
+          <rect x="16.4" y="12.6" width="12" height="71" rx="6" transform="rotate(-45 16.4 12.6)" fill="rgba(255,255,255,0.9)"/>
+          <rect x="12.6" y="66.7" width="12" height="71" rx="6" transform="rotate(-135 12.6 66.7)" fill="rgba(255,255,255,0.9)"/>
         </svg>
-        Snowflake
+      </div>
+      <div class="hero-badge-dot"></div>
+      <span class="hero-badge-text">Domo + Snowflake — Better Together</span>
+    </div>
+
+    <h1>Streamline Your Data Ecosystem.<br><em>Starting with Snowflake.</em></h1>
+
+    <p class="hero-sub">
+      Bring every data source into Snowflake — or connect Snowflake to the rest of your stack. Domo's native integration gives you 1,000+ connectors, enterprise governance, and real-time pipelines, all without moving a byte out of your warehouse.
+    </p>
+
+    <div class="hero-actions">
+      <a href="https://www.domo.com/platform/integration" class="btn-orange" target="_blank" rel="noopener">Explore Connectors</a>
+      <a href="https://www.domo.com/partners/snowflake" class="btn-ghost-pill" target="_blank" rel="noopener">View Partnership</a>
+    </div>
+
+    <div class="hero-logos-row">
+      <div class="hero-logo-chip">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="20" height="20" aria-hidden="true">
+          <path fill="#fff" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
+          <path fill="#fff" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
+          <path fill="#fff" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+          <path fill="#fff" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+          <path fill="rgba(255,255,255,0.4)" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
+        </svg>
+        <span>Domo</span>
+      </div>
+      <div class="hero-plus">+</div>
+      <div class="hero-logo-chip">
+        <svg width="20" height="20" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+          <rect x="44" y="2" width="12" height="96" rx="6" fill="rgba(255,255,255,0.9)"/>
+          <rect x="2" y="44" width="96" height="12" rx="6" fill="rgba(255,255,255,0.9)"/>
+          <rect x="16.4" y="12.6" width="12" height="71" rx="6" transform="rotate(-45 16.4 12.6)" fill="rgba(255,255,255,0.9)"/>
+          <rect x="12.6" y="66.7" width="12" height="71" rx="6" transform="rotate(-135 12.6 66.7)" fill="rgba(255,255,255,0.9)"/>
+        </svg>
+        <span>Snowflake</span>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- PROBLEM -->
-  <section class="problem-section">
-    <div style="max-width: 960px; margin: 0 auto;">
-      <h2 class="domo-animate">The Last Mile Gap</h2>
-      <p class="domo-animate delay-1">You've invested in Snowflake for world-class storage and compute. But line-of-business teams still can't access that data on their own — creating a gap that delays decisions and slows Snowflake ROI.</p>
-      <div class="problem-cards">
-        <div class="problem-card domo-animate delay-2">
-          <div class="problem-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-          </div>
-          <h3>Business Teams Left Out</h3>
-          <p>Line-of-business users can't access Snowflake data independently — every insight request goes through IT, creating backlogs and delays.</p>
+<!-- ═══ OVERVIEW STRIP ════════════════════════════════════════ -->
+<div class="overview-strip">
+  <div class="overview-strip-inner">
+    <p class="overview-headline">Streamline your data landscape with simple, secure connectors designed to <em>fuel and hydrate your Snowflake ecosystem</em> — bringing together data from any source to reveal the complete story behind your insights.</p>
+    <div class="overview-divider"></div>
+    <div class="overview-stat"><div class="overview-stat-num">1,000+</div><div class="overview-stat-label">Native Connectors</div></div>
+    <div class="overview-divider"></div>
+    <div class="overview-stat"><div class="overview-stat-num">0</div><div class="overview-stat-label">Data Moved Out of Snowflake</div></div>
+    <div class="overview-divider"></div>
+    <div class="overview-stat"><div class="overview-stat-num">3</div><div class="overview-stat-label">Days to First Dashboard</div></div>
+  </div>
+</div>
+
+<!-- ═══ HOW IT CONNECTS ═══════════════════════════════════════ -->
+<section class="section overview-section">
+  <div class="section-inner">
+    <div class="section-header anim">
+      <span class="section-label label-sf"><div class="label-dot label-dot-sf"></div>Integration Overview</span>
+      <h2>Your Snowflake Data, Connected to Everything</h2>
+      <p>Data Integration is the foundational entry point into Domo — establishing the unified, governed data layer your Snowflake environment needs to power analytics, AI, automation, and action across every team.</p>
+    </div>
+    <div class="overview-cards">
+      <div class="overview-card anim d1">
+        <div class="ov-icon ov-icon-sf">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
         </div>
-        <div class="problem-card domo-animate delay-3">
-          <div class="problem-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          </div>
-          <h3>Months to Value</h3>
-          <p>Traditional BI implementations take months before users see any results — slowing adoption and stalling the ROI on your cloud investment.</p>
+        <h3>Feed Snowflake from Anywhere</h3>
+        <p>Connect 1,000+ sources — cloud apps, databases, ERPs, flat files, and APIs — directly into your Snowflake warehouse. Batch, micro-batch, and streaming all supported. Incremental ingestion keeps costs low and data fresh.</p>
+      </div>
+      <div class="overview-card anim d2">
+        <div class="ov-icon ov-icon-domo">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
-        <div class="problem-card domo-animate delay-4">
-          <div class="problem-icon">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
-          </div>
-          <h3>Underutilized Compute</h3>
-          <p>When business users can't easily access data, query volumes stay low — leaving your Snowflake compute capacity underutilized.</p>
+        <h3>Connect Snowflake to the Rest of Your Stack</h3>
+        <p>Native Snowflake connectors let Domo visualize, analyze, and distribute Snowflake data in real-time — with write-back capabilities to push decisions and enriched data back to your warehouse or source systems.</p>
+      </div>
+      <div class="overview-card anim d3">
+        <div class="ov-icon ov-icon-joint">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#FF9922" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
         </div>
+        <h3>Governance That Inherits from Snowflake</h3>
+        <p>Row- and column-level permissions can be inherited directly from your Snowflake warehouse. SOC 2, HIPAA, and GDPR compliance built in — with tamper-proof audit logs and automated PII monitoring across every pipeline.</p>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- HOW IT WORKS -->
-  <section class="how-section">
-    <span class="section-label domo-animate">Better Together</span>
-    <h2 class="domo-animate delay-1">Two Platforms. One Seamless Experience.</h2>
-    <p class="domo-animate delay-2">Snowflake handles the heavy lifting. Domo delivers the results to every person who needs them.</p>
-    <div class="how-stack">
-      <div class="how-block domo-animate delay-2">
-        <div class="how-block-icon" style="background: rgba(41,181,232,0.12);">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
-        </div>
-        <h3>Snowflake</h3>
-        <p>Scalable, secure back-end. Storage, compute, and AI/ML — the single source of truth for your enterprise data.</p>
-      </div>
-      <div class="how-connector domo-animate delay-3">→</div>
-      <div class="how-block domo-animate delay-3">
-        <div class="how-block-icon" style="background: rgba(153,204,238,0.15);">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <h3>Domo</h3>
-        <p>The front-end consumption layer. Apps, dashboards, AI agents, and write-back — all connecting directly to your Snowflake data.</p>
-      </div>
-      <div class="how-connector domo-animate delay-4">=</div>
-      <div class="how-block domo-animate delay-4">
-        <div class="how-block-icon" style="background: rgba(255,153,34,0.12);">
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#FF9922" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
-        </div>
-        <h3>Results</h3>
-        <p>Every team — from executives to front-line operators — acting on trusted, real-time data. No IT bottleneck. No data movement.</p>
-      </div>
+<!-- ═══ FEATURES GRID ═════════════════════════════════════════ -->
+<section class="section features-section">
+  <div class="section-inner">
+    <div class="section-header anim">
+      <span class="section-label label-domo"><div class="label-dot label-dot-domo"></div>Platform Capabilities</span>
+      <h2>Every Integration Capability Your Snowflake Environment Needs</h2>
+      <p>Whether you're moving data into Snowflake, out of it, or transforming it in place — Domo covers every pattern your pipelines require.</p>
     </div>
-    <div class="how-result domo-animate delay-5">
-      <h3>Direct Data Connectivity — Data Stays in Snowflake</h3>
-      <p>Domo queries your Snowflake data in place, so there's no duplication, no sync delays, and no extra storage costs. Native connectors mean you're up and running in minutes, not months.</p>
+    <div class="features-grid">
+
+      <div class="feature-card sf-featured anim d1">
+        <div class="feat-icon feat-icon-sf">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+        </div>
+        <div class="feat-body">
+          <div class="sf-tag">Snowflake Native</div>
+          <h4>Cloud Data Warehouse Integration</h4>
+          <p>Efficiently ingest data into Snowflake or write it back out — supporting batch, micro-batch, and streaming. Data stays in Snowflake; Domo queries it directly.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d2">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 1v4M12 19v4M4.22 4.22l2.83 2.83M16.95 16.95l2.83 2.83M1 12h4M19 12h4M4.22 19.78l2.83-2.83M16.95 7.05l2.83-2.83"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>1,000+ Pre-Built Connectors</h4>
+          <p>Native connections to Salesforce, SAP, Google Analytics, and hundreds more — all flowing into or out of your Snowflake warehouse with rapid time-to-value.</p>
+        </div>
+      </div>
+
+      <div class="feature-card sf-featured anim d3">
+        <div class="feat-icon feat-icon-sf">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        </div>
+        <div class="feat-body">
+          <div class="sf-tag">Snowflake Native</div>
+          <h4>Write-Back to Snowflake</h4>
+          <p>Close the loop — push enriched, transformed, or user-generated data back to Snowflake from Domo apps and dashboards. Keep your warehouse as the system of record.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d1">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Incremental Ingestion</h4>
+          <p>Ingest only what has changed since your last run — or re-sync full historical data on demand. Optimizes Snowflake compute consumption and keeps pipelines lean.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d2">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Flexible Ingestion Cadence</h4>
+          <p>Choose any cadence — from simple file uploads to near real-time. Use upsert, partitioning, full replace, or append methods to match your Snowflake architecture.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d3">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Push &amp; Pull Model Support</h4>
+          <p>Support both push and pull patterns for maximum flexibility — synchronize data across environments regardless of where it originates relative to Snowflake.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d1">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 20V10M12 20V4M6 20v-6"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Event-Based Pipeline Triggers</h4>
+          <p>Automate data flows based on specific Snowflake activities or upstream data changes — so pipelines run when your data is ready, not on a fixed clock.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d2">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Custom Connector IDE</h4>
+          <p>Build and publish custom connectors for any API not in the AppStore — without managing hosting or infrastructure. Connect any source directly to Snowflake.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d3">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>CLI Tools &amp; Automation</h4>
+          <p>Schedule, trigger, and monitor pipelines programmatically. Less manual intervention — full CI/CD-style control over your Snowflake data supply chain.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d1">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Flat File &amp; Document Ingestion</h4>
+          <p>Drag-and-drop tools let non-technical users ingest Excel, CSV, and documents directly into the pipeline feeding Snowflake — no engineering ticket required.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d2">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22V12M12 12L8 16M12 12l4 4"/><path d="M20 16.58A5 5 0 0 0 18 7h-1.26A8 8 0 1 0 4 15.25"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>Versioned Sandbox Environments</h4>
+          <p>Safely test pipeline changes in a versioned environment before promoting to production — protecting the integrity of your Snowflake data foundation.</p>
+        </div>
+      </div>
+
+      <div class="feature-card anim d3">
+        <div class="feat-icon feat-icon-domo">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </div>
+        <div class="feat-body">
+          <h4>AI-Assisted Troubleshooting</h4>
+          <p>AI identifies root causes of pipeline failures and suggests fixes — so data engineers spend less time debugging and more time building the pipelines your Snowflake environment needs.</p>
+        </div>
+      </div>
+
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- STATS -->
-  <section class="stats-strip">
-    <div class="stats-inner">
-      <div class="stat-item domo-animate">
-        <div class="stat-number"><span class="count-up" data-target="1000">0</span>+</div>
-        <div class="stat-label">Pre-Built Connectors</div>
-      </div>
-      <div class="stat-item domo-animate delay-1">
-        <div class="stat-number"><span class="count-up" data-target="3">0</span> days</div>
-        <div class="stat-label">Average Time to First Dashboard</div>
-      </div>
-      <div class="stat-item domo-animate delay-2">
-        <div class="stat-number"><span class="count-up" data-target="56">0</span>+</div>
-        <div class="stat-label">Integration Categories</div>
-      </div>
-      <div class="stat-item domo-animate delay-3">
-        <div class="stat-number"><span class="count-up" data-target="100">0</span>%</div>
-        <div class="stat-label">Data Stays in Snowflake</div>
-      </div>
+<!-- ═══ STATS BAND ════════════════════════════════════════════ -->
+<div class="stats-band">
+  <div class="stats-band-inner">
+    <div class="anim">
+      <div class="stat-n"><span class="count-up" data-t="1000">0</span>+</div>
+      <div class="stat-l">Pre-Built Connectors</div>
     </div>
-  </section>
-
-  <!-- BENEFITS -->
-  <section class="benefits-section">
-    <div class="benefits-inner">
-      <span class="section-label domo-animate">Key Benefits</span>
-      <h2 class="domo-animate delay-1">Built for Snowflake Customers</h2>
-      <p class="domo-animate delay-2">Three ways Domo turns your Snowflake investment into measurable business results.</p>
-      <div class="benefits-grid">
-
-        <div class="benefit-card domo-animate delay-2">
-          <div class="benefit-number">01</div>
-          <h3>Speed &amp; Agility</h3>
-          <p>Move from data ingestion to business impact in days, not months. Direct integration with Snowflake simplifies unifying and transforming data — and lets line-of-business teams access the insights they need without waiting on IT.</p>
-          <div class="benefit-impact">
-            <div class="impact-dot"></div>
-            <p>Accelerate analytics cycles and eliminate the IT bottleneck on every insight request.</p>
-          </div>
-        </div>
-
-        <div class="benefit-card domo-animate delay-3">
-          <div class="benefit-number">02</div>
-          <h3>Governance &amp; Trust</h3>
-          <p>Extend trusted data access safely across your entire organization. Domo's governance model works alongside Snowflake's security protocols, enabling secure, role-based sharing across departments — with row and column level permissions inherited from your warehouse.</p>
-          <div class="benefit-impact">
-            <div class="impact-dot"></div>
-            <p>Create an empowered data culture where everyone acts on the same trusted information.</p>
-          </div>
-        </div>
-
-        <div class="benefit-card domo-animate delay-4">
-          <div class="benefit-number">03</div>
-          <h3>AI &amp; Innovation at Scale</h3>
-          <p>Leverage Snowflake's AI/ML capabilities directly within Domo — automate workflows, build intelligent apps, and deploy AI agents on top of your Snowflake data. Unlock measurable efficiency gains and operationalize AI responsibly across every department.</p>
-          <div class="benefit-impact">
-            <div class="impact-dot"></div>
-            <p>Turn static data into intelligent action — AI agents working directly on your Snowflake data.</p>
-          </div>
-        </div>
-
-      </div>
+    <div class="anim d1">
+      <div class="stat-n"><span class="count-up" data-t="56">0</span>+</div>
+      <div class="stat-l">Integration Categories</div>
     </div>
-  </section>
+    <div class="anim d2">
+      <div class="stat-n"><span class="count-up" data-t="100">0</span>%</div>
+      <div class="stat-l">Data Stays in Snowflake</div>
+    </div>
+    <div class="anim d3">
+      <div class="stat-n"><span class="count-up" data-t="2600">0</span>+</div>
+      <div class="stat-l">Customers Worldwide</div>
+    </div>
+  </div>
+</div>
 
-  <!-- TECHNICAL INTEGRATION -->
-  <section class="tech-section">
-    <div class="tech-inner">
-      <div class="tech-content domo-animate">
-        <span class="section-label">Technical Integration</span>
-        <h2>Native Snowflake Connectivity</h2>
-        <p>Domo connects to Snowflake through native, certified connectors — no middleware, no custom ETL, no data movement. Your data stays exactly where it belongs.</p>
-        <div class="tech-features">
-          <div class="tech-feature">
-            <div class="tech-feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+<!-- ═══ TRANSFORM / MAGIC ETL ════════════════════════════════ -->
+<section class="section transform-section">
+  <div class="section-inner">
+    <div class="transform-inner">
+      <div class="transform-content anim">
+        <span class="section-label label-domo"><div class="label-dot label-dot-domo"></div>Magic Transformation</span>
+        <h2>Transform Data In-Flight — Before It Reaches Snowflake or After</h2>
+        <p>Empower everyone to turn raw data into actionable, Snowflake-ready assets. Clean, enrich, and transform data with a visual drag-and-drop builder or full SQL — no separate ETL tool required.</p>
+        <div class="transform-list">
+          <div class="tl-item">
+            <div class="tl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             </div>
-            <div class="tech-feature-text">
-              <h4>Direct Data Connectivity</h4>
-              <p>Data stays in Snowflake while being visualized in Domo — optimizing performance and cost.</p>
-            </div>
-          </div>
-          <div class="tech-feature">
-            <div class="tech-feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            </div>
-            <div class="tech-feature-text">
-              <h4>Write-Back Capabilities</h4>
-              <p>Users can write decisions and data back to Snowflake directly from Domo apps.</p>
+            <div class="tl-text">
+              <h4>Visual Drag-and-Drop ETL Pipeline Builder</h4>
+              <p>Map every step of data's journey into or out of Snowflake — no code, complex pipelines made intuitive.</p>
             </div>
           </div>
-          <div class="tech-feature">
-            <div class="tech-feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div class="tl-item">
+            <div class="tl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
             </div>
-            <div class="tech-feature-text">
-              <h4>Real-Time Data Access</h4>
-              <p>Connect to live Snowflake data for dashboards that reflect the current state of your business.</p>
+            <div class="tl-text">
+              <h4>ETL and ELT with Full SQL Control</h4>
+              <p>Write powerful SQL transformations with full control over output method — upsert, append, partition, or full replace into Snowflake.</p>
             </div>
           </div>
-          <div class="tech-feature">
-            <div class="tech-feature-icon">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#99CCEE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><line x1="3" y1="9" x2="21" y2="9"/><line x1="9" y1="21" x2="9" y2="9"/></svg>
+          <div class="tl-item">
+            <div class="tl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
             </div>
-            <div class="tech-feature-text">
-              <h4>Low-Code App Creation</h4>
-              <p>Build custom data apps on Snowflake data without writing a line of back-end code.</p>
+            <div class="tl-text">
+              <h4>AI &amp; ML Enrichment with BYOM</h4>
+              <p>Enrich Snowflake pipelines with AI — use Domo's native models, your own, or plug into Hugging Face, OpenAI, or Anthropic mid-pipeline.</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+            </div>
+            <div class="tl-text">
+              <h4>Reverse ETL to Snowflake and Source Systems</h4>
+              <p>Send transformed, enriched data back to Snowflake, Salesforce, Workday, or any system — closing the loop on your data automation.</p>
+            </div>
+          </div>
+          <div class="tl-item">
+            <div class="tl-icon">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            </div>
+            <div class="tl-text">
+              <h4>Interactive Data Lineage Map</h4>
+              <p>See exactly how data flows from every source through transformations into Snowflake — and back out to consumers. Full dependency tracking, instant troubleshooting.</p>
             </div>
           </div>
         </div>
       </div>
 
-      <div class="tech-visual domo-animate delay-2">
-        <div class="arch-diagram">
-          <div class="arch-layer">
-            <div class="arch-layer-icon">👥</div>
+      <div class="transform-visual anim d2">
+        <div class="tv-header">
+          <svg width="28" height="28" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+            <rect x="44" y="2" width="12" height="96" rx="6" fill="#29B5E8"/>
+            <rect x="2" y="44" width="96" height="12" rx="6" fill="#29B5E8"/>
+            <rect x="16.4" y="12.6" width="12" height="71" rx="6" transform="rotate(-45 16.4 12.6)" fill="#29B5E8"/>
+            <rect x="12.6" y="66.7" width="12" height="71" rx="6" transform="rotate(-135 12.6 66.7)" fill="#29B5E8"/>
+          </svg>
+          <div class="tv-header-text">
+            <h3>Snowflake Pipeline Architecture</h3>
+            <p>How Domo connects your ecosystem</p>
+          </div>
+        </div>
+        <div class="pipeline-row">
+          <div class="pipeline-node pn-sources">
+            <div class="pn-dot" style="background: rgba(255,255,255,0.08);">🔌</div>
             <div>
-              <div class="arch-layer-label layer-domo">Domo — Business Layer</div>
-              <div class="arch-layer-desc" style="color: rgba(255,255,255,0.6);">Apps · Dashboards · AI Agents · Write-Back</div>
+              <div class="pn-label" style="color: rgba(255,255,255,0.7);">Source Systems</div>
+              <div class="pn-sub" style="color: rgba(255,255,255,0.4);">Salesforce · SAP · Google Analytics · Files · APIs · DBs</div>
             </div>
           </div>
-          <div class="arch-arrow">↕ Native Connector (no data copy)</div>
-          <div class="arch-layer">
-            <div class="arch-layer-icon">❄️</div>
+          <div class="pn-arrow">↓</div>
+          <div class="pipeline-node pn-domo">
+            <div class="pn-dot" style="background: rgba(153,204,238,0.2);">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="14" height="14" aria-hidden="true">
+                <path fill="#99CCEE" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
+                <path fill="#99CCEE" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
+                <path fill="#99CCEE" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+                <path fill="#99CCEE" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
+              </svg>
+            </div>
             <div>
-              <div class="arch-layer-label layer-sf">Snowflake — Data Layer</div>
-              <div class="arch-layer-desc" style="color: rgba(255,255,255,0.6);">Storage · Compute · AI/ML · Security</div>
+              <div class="pn-label" style="color: var(--domo-blue);">Domo — Ingest &amp; Transform</div>
+              <div class="pn-sub">ETL · Magic Transformation · AI Enrichment</div>
             </div>
           </div>
-          <div class="arch-arrow">↑ Your Data Sources (1,000+ connectors)</div>
-          <div class="arch-layer">
-            <div class="arch-layer-icon">🔌</div>
+          <div class="pn-arrow">↕</div>
+          <div class="pipeline-node pn-sf">
+            <div class="pn-dot" style="background: rgba(41,181,232,0.2);">
+              <svg width="14" height="14" viewBox="0 0 100 100" fill="none" aria-hidden="true">
+                <rect x="44" y="5" width="12" height="90" rx="6" fill="#29B5E8"/>
+                <rect x="5" y="44" width="90" height="12" rx="6" fill="#29B5E8"/>
+                <rect x="18.4" y="14.6" width="12" height="70.7" rx="6" transform="rotate(-45 18.4 14.6)" fill="#29B5E8"/>
+                <rect x="14.6" y="68.7" width="12" height="70.7" rx="6" transform="rotate(-135 14.6 68.7)" fill="#29B5E8"/>
+              </svg>
+            </div>
             <div>
-              <div class="arch-layer-label" style="color: var(--neutral-200);">Source Systems</div>
-              <div class="arch-layer-desc" style="color: rgba(255,255,255,0.6);">Salesforce · SAP · ERPs · Files · APIs</div>
+              <div class="pn-label" style="color: var(--sf-blue);">Snowflake — Storage &amp; Compute</div>
+              <div class="pn-sub">Governed · Scalable · Secure · Single Source of Truth</div>
             </div>
           </div>
-          <div style="margin-top: 1rem; padding: 0.875rem 1rem; background: rgba(255,153,34,0.1); border: 1px solid rgba(255,153,34,0.25); border-radius: var(--radius-md);">
-            <div class="arch-layer-label layer-result" style="font-size: 0.7rem; margin-bottom: 0.2rem;">The Result</div>
-            <div class="arch-layer-desc" style="color: rgba(255,255,255,0.7); font-size: 0.82rem;">Consumer-grade interface for all users with enterprise-grade governance. SOC 2, HIPAA & GDPR certified.</div>
+          <div class="pn-arrow">↓</div>
+          <div class="pipeline-node pn-output">
+            <div class="pn-dot" style="background: rgba(255,153,34,0.15);">📊</div>
+            <div>
+              <div class="pn-label" style="color: #FF9922;">Business — Dashboards, Apps &amp; AI</div>
+              <div class="pn-sub">Every team acting on trusted, real-time Snowflake data</div>
+            </div>
           </div>
+        </div>
+        <div class="tv-note"><strong>Direct connectivity:</strong> Domo queries Snowflake in place. No data duplication. No sync delay. Permissions inherited from your warehouse.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══ GOVERNANCE + SECURITY ════════════════════════════════ -->
+<section class="section security-section">
+  <div class="section-inner">
+    <div class="section-header anim">
+      <span class="section-label label-sf"><div class="label-dot label-dot-sf"></div>Security &amp; Governance</span>
+      <h2>Enterprise-Grade Protection Across Every Snowflake Pipeline</h2>
+      <p>Governance and security aren't afterthoughts — they're built into the foundation, from ingestion forward.</p>
+    </div>
+    <div class="security-grid">
+      <div class="security-card anim d1">
+        <div class="sec-icon" style="background: rgba(153,204,238,0.15);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+        </div>
+        <h4>Row &amp; Column Level Permissions</h4>
+        <p>Granular access control inherited directly from your Snowflake warehouse — consistent permissions across every dashboard, app, and pipeline without re-configuration.</p>
+        <div class="cert-badges">
+          <span class="cert-badge cert-sf">Snowflake Native</span>
+        </div>
+      </div>
+      <div class="security-card anim d2">
+        <div class="sec-icon" style="background: rgba(41,181,232,0.1);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        </div>
+        <h4>Automated PII Monitoring</h4>
+        <p>Automatically surface potential PII risks before they become compliance issues — across every pipeline feeding or drawing from your Snowflake environment.</p>
+      </div>
+      <div class="security-card anim d3">
+        <div class="sec-icon" style="background: rgba(153,204,238,0.15);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+        </div>
+        <h4>Tamper-Proof Audit Logs</h4>
+        <p>A clear, immutable record of every data access, change, and usage event — across Domo and Snowflake — for compliance, auditing, and peace of mind.</p>
+      </div>
+      <div class="security-card anim d4">
+        <div class="sec-icon" style="background: rgba(41,181,232,0.1);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h4>Real-Time Anomaly Alerting</h4>
+        <p>Instantly notify teams of pipeline anomalies, failures, or unexpected data changes via email, mobile, or Slack — before issues impact Snowflake-powered reports.</p>
+      </div>
+      <div class="security-card anim d5">
+        <div class="sec-icon" style="background: rgba(153,204,238,0.15);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7BB8E0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        </div>
+        <h4>Data Lineage &amp; DomoStats</h4>
+        <p>Track lineage from every source to Snowflake and downstream. Deep visibility into pipeline performance, usage, and business impact with system-generated DomoStats.</p>
+      </div>
+      <div class="security-card anim d6">
+        <div class="sec-icon" style="background: rgba(41,181,232,0.1);">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#29B5E8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        </div>
+        <h4>Certifications Built In</h4>
+        <p>Industry-leading certifications ensure verifiable security and regulatory compliance across every pipeline integrated with your Snowflake environment.</p>
+        <div class="cert-badges">
+          <span class="cert-badge cert-domo">SOC 2</span>
+          <span class="cert-badge cert-domo">HIPAA</span>
+          <span class="cert-badge cert-domo">GDPR</span>
         </div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- QUOTE -->
-  <section class="quote-section">
-    <div style="max-width: 800px; margin: 0 auto;">
-      <div class="quote-mark domo-animate">"</div>
-      <p class="quote-text domo-animate delay-1">
-        Snowflake already had a relationship with Domo, and to bring the two together and optimize the combined solution was particularly easy.
-      </p>
-      <div class="quote-attribution domo-animate delay-2">
-        Brian Smith
-        <span>General Manager of Transformation, National Tiles</span>
+<!-- ═══ QUOTES ════════════════════════════════════════════════ -->
+<section class="quote-section">
+  <div class="quotes-inner">
+    <div class="section-header anim" style="margin-bottom: 2.5rem;">
+      <span class="section-label" style="color: var(--sf-star-blue); background: rgba(113,211,220,0.12); display: inline-flex; align-items: center; gap: 0.4rem;"><div class="label-dot" style="background: var(--sf-star-blue); animation: pulse 2s ease-in-out infinite;"></div>Customer Stories</span>
+      <h2 style="color: #fff;">Real Teams. Real Snowflake Results.</h2>
+    </div>
+    <div class="quotes-grid">
+      <div class="quote-card anim d1">
+        <div class="quote-mark" style="color: var(--domo-blue);">"</div>
+        <p class="quote-text">Snowflake already had a relationship with Domo, and to bring the two together and optimize the combined solution was particularly easy.</p>
+        <div class="quote-attrib" style="color: #fff;">Brian Smith<span>General Manager of Transformation, National Tiles</span></div>
+      </div>
+      <div class="quote-card anim d2">
+        <div class="quote-mark" style="color: var(--sf-star-blue);">"</div>
+        <p class="quote-text">It used to take days to go to each platform, pull all the data, combine and analyze it in a spreadsheet. With Domo, all we need to do in the morning now is look at the data, add our insight, and send it to the client. What used to take 2.5 days now takes one hour.</p>
+        <div class="quote-attrib" style="color: #fff;">Laura Ziupsnyte<span>BI Developer, All Response Media</span></div>
       </div>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- CTA -->
-  <section class="cta-section">
-    <div class="cta-inner">
-      <span class="section-label domo-animate">Get Started</span>
-      <h2 class="domo-animate delay-1">Ready to Close the Last Mile?</h2>
-      <p class="domo-animate delay-2">See how Domo puts your Snowflake data in the hands of every decision-maker — connect and visualize in minutes, not months.</p>
-      <div class="cta-buttons domo-animate delay-3">
-        <a href="https://www.domo.com/partners/snowflake" class="btn-cta-primary" target="_blank" rel="noopener">Explore the Partnership</a>
-        <a href="https://www.domo.com/" class="btn-cta-secondary" target="_blank" rel="noopener">Request a Demo</a>
-      </div>
+<!-- ═══ CTA ════════════════════════════════════════════════════ -->
+<section class="cta-section">
+  <div class="cta-inner">
+    <span class="section-label label-sf anim"><div class="label-dot label-dot-sf"></div>Get Started</span>
+    <h2 class="anim d1">Connect Your Snowflake Environment to Everything.</h2>
+    <p class="anim d2">Domo's native integration gives your Snowflake warehouse 1,000+ connectors, enterprise governance, and a direct path from raw data to business action — without moving a byte.</p>
+    <div class="cta-btns anim d3">
+      <a href="https://www.domo.com/platform/integration" class="btn-cta-orange" target="_blank" rel="noopener">Explore All Connectors</a>
+      <a href="https://www.domo.com/partners/snowflake" class="btn-cta-sf" target="_blank" rel="noopener">View Snowflake Partnership</a>
     </div>
-  </section>
+  </div>
+</section>
 
-  <!-- FOOTER -->
-  <footer>
-    <div class="footer-left">
-      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="48" height="48" aria-label="Domo logo">
+<!-- ═══ FOOTER ════════════════════════════════════════════════ -->
+<footer>
+  <div>
+    <div class="footer-logos">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="48" height="48" aria-label="Domo">
         <path fill="#fff" d="M150.5,328.6c12.4,13.8,21.2,30.9,25,49.8,9.9-48.8,53-85.5,104.7-85.5s94.8,36.8,104.7,85.6v-85.6l106.8,106.8,107.1-106.8v85.6c9.9-48.8,53-85.6,104.7-85.6s79.2,24.8,96.4,60.7V0H0v292.9h70.8c31.7,0,60.1,13.8,79.7,35.7Z"/>
         <path fill="#fff" d="M703.6,506.6c-51.7,0-94.8-36.8-104.7-85.6v85.6h-36v-127.8l-71.1,71.4-71.4-71.4v127.8h-35.4v-85.6c-9.9,48.8-53,85.6-104.7,85.6s-94.8-36.7-104.7-85.5c-3.8,18.9-12.6,36-25,49.8-19.6,21.9-48,35.7-79.7,35.7H0v293.4h800v-354.2c-17.2,35.9-53.9,60.7-96.4,60.7h0Z"/>
         <path fill="#fff" d="M280.2,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-        <path fill="#fff" d="M142.1,399.7c0-37.8-29.4-68.7-66.6-71.1h-40.1v142.2h40.1c37.2-2.4,66.6-33.3,66.6-71.1h0Z"/>
         <path fill="#fff" d="M703.6,471c39.4,0,71.3-31.9,71.3-71.3s-31.9-71.3-71.3-71.3-71.3,31.9-71.3,71.3,31.9,71.3,71.3,71.3Z"/>
-        <path fill="rgba(255,255,255,0.4)" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
+        <path fill="rgba(255,255,255,0.35)" d="M150.5,470.8c12.4-13.8,21.2-30.9,25-49.8,9.9,48.8,53,85.5,104.7,85.5s94.8-36.8,104.7-85.6v85.6h35.4v-127.8l71.4,71.4,71.1-71.4v127.8h36v-85.6c9.9,48.8,53,85.6,104.7,85.6s79.2-24.8,96.4-60.7v-92.2c-17.2-35.9-53.9-60.7-96.4-60.7s-94.8,36.8-104.7,85.6v-85.6l-107.1,106.8-106.8-106.8v85.6c-9.9-48.8-53-85.6-104.7-85.6s-94.8,36.7-104.7,85.5c-3.8-18.9-12.6-36-25-49.8-19.6-21.9-48-35.7-79.7-35.7H0v213.7h70.8c31.7,0,60.1-13.8,79.7-35.7h0ZM703.6,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM280.2,328.5c39.4,0,71.3,31.9,71.3,71.3s-31.9,71.3-71.3,71.3-71.3-31.9-71.3-71.3,31.9-71.3,71.3-71.3ZM35.4,328.6h40.1c37.2,2.4,66.6,33.3,66.6,71.1s-29.4,68.7-66.6,71.1h-40.1v-142.2h0Z"/>
       </svg>
-      <span class="footer-tagline">© 2026 Domo, Inc. All rights reserved.</span>
+      <div style="width:1px; height:32px; background: rgba(255,255,255,0.1);"></div>
+      <svg width="42" height="42" viewBox="0 0 100 100" fill="none" aria-label="Snowflake">
+        <rect x="44" y="2" width="12" height="96" rx="6" fill="rgba(255,255,255,0.7)"/>
+        <rect x="2" y="44" width="96" height="12" rx="6" fill="rgba(255,255,255,0.7)"/>
+        <rect x="16.4" y="12.6" width="12" height="71" rx="6" transform="rotate(-45 16.4 12.6)" fill="rgba(255,255,255,0.7)"/>
+        <rect x="12.6" y="66.7" width="12" height="71" rx="6" transform="rotate(-135 12.6 66.7)" fill="rgba(255,255,255,0.7)"/>
+      </svg>
     </div>
-    <div class="footer-links">
-      <a href="https://www.domo.com/partners/snowflake" target="_blank" rel="noopener">Partnership Page</a>
-      <a href="https://www.domo.com/learn/privacy-policy" target="_blank" rel="noopener">Privacy</a>
-      <a href="https://www.domo.com/" target="_blank" rel="noopener">Domo.com</a>
-    </div>
-  </footer>
+    <div class="footer-copy" style="margin-top: 0.5rem;">© 2026 Domo, Inc. &amp; Snowflake Inc. All rights reserved.</div>
+  </div>
+  <div class="footer-links">
+    <a href="https://www.domo.com/platform/integration" target="_blank" rel="noopener">Data Integration</a>
+    <a href="https://www.domo.com/partners/snowflake" target="_blank" rel="noopener">Snowflake Partnership</a>
+    <a href="https://www.snowflake.com/en/why-snowflake/partners/all-partners/domo/" target="_blank" rel="noopener">Snowflake Marketplace</a>
+    <a href="https://www.domo.com/" target="_blank" rel="noopener">Domo.com</a>
+  </div>
+</footer>
 
-  <script>
-    // ─── SCROLL ANIMATIONS ────────────────────────────────────
-    const observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.classList.add('visible');
-          observer.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.12 });
+<script>
+  // ─── SCROLL ANIMATIONS ──────────────────────────────────────
+  const io = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('in'); io.unobserve(e.target); } });
+  }, { threshold: 0.1 });
+  document.querySelectorAll('.anim').forEach(el => io.observe(el));
 
-    document.querySelectorAll('.domo-animate').forEach(el => observer.observe(el));
-
-    // ─── COUNT-UP ANIMATION ───────────────────────────────────
-    function animateCount(el, target, duration = 1800) {
-      const startTime = performance.now();
-      function update(now) {
-        const elapsed = now - startTime;
-        const progress = Math.min(elapsed / duration, 1);
-        const easeOut = 1 - Math.pow(2, -10 * progress);
-        el.textContent = Math.floor(easeOut * target).toLocaleString();
-        if (progress < 1) requestAnimationFrame(update);
+  // ─── COUNT-UP ───────────────────────────────────────────────
+  function countUp(el, target, dur = 1800) {
+    const t0 = performance.now();
+    (function tick(now) {
+      const p = Math.min((now - t0) / dur, 1);
+      const v = Math.floor((1 - Math.pow(2, -10 * p)) * target);
+      el.textContent = v.toLocaleString();
+      if (p < 1) requestAnimationFrame(tick);
+    })(performance.now());
+  }
+  const statsIO = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if (e.isIntersecting) {
+        e.target.querySelectorAll('.count-up').forEach(el => countUp(el, +el.dataset.t));
+        statsIO.unobserve(e.target);
       }
-      requestAnimationFrame(update);
-    }
-
-    const statsObserver = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        if (entry.isIntersecting) {
-          entry.target.querySelectorAll('.count-up').forEach(el => {
-            animateCount(el, parseInt(el.dataset.target));
-          });
-          statsObserver.unobserve(entry.target);
-        }
-      });
-    }, { threshold: 0.3 });
-
-    const statsSection = document.querySelector('.stats-strip');
-    if (statsSection) statsObserver.observe(statsSection);
-  </script>
+    });
+  }, { threshold: 0.3 });
+  const statsBand = document.querySelector('.stats-band');
+  if (statsBand) statsIO.observe(statsBand);
+</script>
 
 </body>
 </html>
